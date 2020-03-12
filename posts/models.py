@@ -10,6 +10,10 @@ class Group(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(max_length=400)
 
+    def __str__(self):
+        # выводим название группы там где на это запрос пойдет
+        return self.title
+
 
 class Post(models.Model):
     text = models.TextField()

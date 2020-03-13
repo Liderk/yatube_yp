@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 
-from .models import Post, Group
+from .models import Post, User
 from django.shortcuts import render
 from django.shortcuts import redirect
 from .forms import user_create_new_post
@@ -22,7 +22,11 @@ def group_posts(request, slug):
 def new_post(request):
     if request.method == 'POST':
         form = user_create_new_post(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = User.objects.get(username=request.user)
+            post.save()
+            return redirect('/')
         return render(request, 'new_post.html', {'form': form})
     form = user_create_new_post()
     return render(request, 'new_post.html', {'form': form})
-

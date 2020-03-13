@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+
 </p>
             <form method="post">
                 {% csrf_token %}
-                <p>{{ form }} </p>
+                <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
+                <p>{{ form.text }} введите текст поста </p>
                 <input type="submit" value="Отправить">
             </form>
 {% endblock %}

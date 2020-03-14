@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from .models import Post, User, Group
 from django.shortcuts import render
@@ -18,7 +19,9 @@ def group_posts(request, slug):
     posts = Post.objects.filter(group=group).order_by("-pub_date")[:12]
     return render(request, "group.html", {"group": group, "posts": posts})
 
-
+@login_required
+# исползуем декоратор, если пользователь не авторизован, то перенаправляем его login.html по адресу прописанном
+# в settings.LOGIN_URL. Если авторизован, то выполняется код представления
 def new_post(request):
     if request.method == 'POST':
         form = User_Create_New_Post(request.POST)

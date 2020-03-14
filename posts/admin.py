@@ -18,13 +18,12 @@ class PostAdmin(admin.ModelAdmin):
 class GroupAdmin(admin.ModelAdmin):
     # перечисляем поля, которые должны отображаться в админке
     list_display = ("pk", "title", "description")
-    # добавляем интерфейс для поиска по тексту постов
+    # добавляем интерфейс для отображения парамтеров групп
     search_fields = ("title",)
-    # добавляем возможность фильтрации по дате
     list_filter = ("title",)
     empty_value_display = '-пусто-'
 
 
-# при регистрации модели Post источником конфигурации для неё назначаем класс PostAdmin
+# при регистрации модели Post и источником конфигурации для них назначаем класс PostAdmin и GroupAdmin
 admin.site.register(Post, PostAdmin)
 admin.site.register(Group, GroupAdmin)

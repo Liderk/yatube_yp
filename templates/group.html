@@ -1,29 +1,23 @@
 {% extends "base.html" %}
-<!doctype html>
-<html>
-  <head>
+{% block title %} Записи сообщества {{group.title}} | Yatube {% endblock %}
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %} Записи сообщества {{group.title}} | Yatube {% endblock %}</title>
+{%block description%}
+    <h1>{{group.title|title}}</h1>
+    <h2>{{group.description}}</h2>
+{% endblock %}
 
+{% block content %}
+  {% for post in page %}
+        {% block for %}
+          <h3>
+              Автор: {{ post.author.get_full_name }} Дата публикации: {{ post.pub_date|date:"d M Y" }}
+          </h3>
+          <p>{{ post.text|linebreaksbr }}</p>
+          <hr>
+        {% endblock for %}
+  {% endfor %}
 
-  </head>
-  <body>
-  {% block content %}
-      <h1>{{group.title}}</h1>
-      <p>{{group.description}}</p>
-
-          {% for post in posts %}
-      <h3>
-          Автор: {{ post.author.get_full_name }} Дата публикации: {{ post.pub_date|date:"d M Y" }}
-      </h3>
-      <p>{{ post.text|linebreaksbr }}</p>
-      <hr>
-          {% endfor %}
-  {% endblock %}
-
-
-
-  </body>
-</html>
+    {% if page.has_other_pages %}
+        {% include "paginator.html" with items=page paginator=paginator%}
+    {% endif %}
+{% endblock %}

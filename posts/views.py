@@ -24,6 +24,7 @@ def group_posts(request, slug):
     page = paginator.get_page(page_number)
     return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
 
+
 @login_required
 # исползуем декоратор, если пользователь не авторизован, то перенаправляем его login.html по адресу прописанном
 # в settings.LOGIN_URL. Если авторизован, то выполняется код представления
@@ -38,3 +39,25 @@ def new_post(request):
         return render(request, 'new_post.html', {'form': form})
     form = UserCreateNewPost()
     return render(request, 'new_post.html', {'form': form})
+
+
+def profile(request, username):
+    author = User.objects.get(username=username)
+    posts = Post.objects.filter(author=author).all()
+
+    return render(request, "profile.html", {'posts': posts})
+
+
+def post_view(request, username, post_id):
+    # тут тело функции
+    # return render(request, "post.html", {})
+    pass
+
+
+def post_edit(request, username, post_id):
+    # тут тело функции. Не забудьте проверить,
+    # что текущий пользователь — это автор записи.
+    # В качестве шаблона страницы редактирования укажите шаблон создания новой записи
+    # который вы создали раньше (вы могли назвать шаблон иначе)
+    # return render(request, "post_new.html", {})
+    pass

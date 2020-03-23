@@ -2,9 +2,8 @@
 {% block title %} Последние обновления {% endblock %}
 
 {%block description%}
+{% csrf_token %}
     <h1> Последние обновления на сайте</h1>
- {% load staticfiles %} <!-- Prepare django to load static files -->
-<!--<img src={% static "img/code_review.png" %}>-->
-<!--<img src="{{ MEDIA_URL }} img/us.png"/>-->
+
 {% endblock %}
 

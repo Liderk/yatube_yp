@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Профиль пользователя {{ author.username }} {% endblock %}
 {% block content %}
-
+{% csrf_token %}
         <main role="main" class="container">
             <div class="row">
 
@@ -44,7 +44,7 @@
                                     <div class="card-body">
                                             <p class="card-text">
                                                     <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
-                                                    <a href="{{post.author.username}}"><strong class="d-block text-gray-dark">@{{post.author.username}}</strong></a>
+                                                    <a href="/user/{{post.author.username}}"><strong class="d-block text-gray-dark">@{{post.author.username}}</strong></a>
                                                     <!-- Текст поста -->
                                                     {{post.text}}
                                             </p>
@@ -52,8 +52,10 @@
                                                     <div class="btn-group ">
                                                             <!-- Ссылка на страницу записи в атрибуте href-->
                                                             <a class="btn btn-sm text-muted" href="{{post.id}}/" role="button">Добавить комментарий</a>
+                                                        {% if request.user.username == author.username %}
                                                             <!-- Ссылка на редактирование, показывается только автору записи -->
                                                             <a class="btn btn-sm text-muted" href="{{post.id}}/edit" role="button">Редактировать</a>
+                                                        {% endif %}
                                                     </div>
 
                                                     <small class="text-muted">{{post.pub_date|date:"d M Y" }}</small>
@@ -66,7 +68,7 @@
                         <!-- Остальные посты -->
 
                 {% if page.has_other_pages %}
-                    {% include "paginator.html" with items=page paginator=paginator%}
+                    {% include "paginator.html" with items=page paginator=page.paginator%}
                 {% endif %}
              </div>
             </div>

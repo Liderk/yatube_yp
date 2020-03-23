@@ -47,20 +47,27 @@ def profile(request, username):
     paginator = Paginator(posts, 3)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "profile.html", {'author': author, 'page': page, 'paginator': paginator})
+    return render(request, "profile.html", {'author': author, 'page': page, })
 
 
 def post_view(request, username, post_id):
     author = get_object_or_404(User, username=username)
-    post = Post.objects.get(author=author, id=post_id)
-    return render(request, "post.html", {'post': post, 'author': author,})
-
+    post = Post.objects.get(id=post_id)
+    posts_count = Post.objects.filter(author=author)
+    return render(request, "post.html", {'post': post, 'posts_count': posts_count})
 
 
 def post_edit(request, username, post_id):
+    author = get_object_or_404(User, username=username)
+    post = Post.objects.get(author=author, id=post_id)
+    form = UserCreateNewPost(request.POST)
+    if form.is_valid():
+        post.text = post
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+    return render(request, "edit.html", {})
     # тут тело функции. Не забудьте проверить,
     # что текущий пользователь — это автор записи.
     # В качестве шаблона страницы редактирования укажите шаблон создания новой записи
     # который вы создали раньше (вы могли назвать шаблон иначе)
-    # return render(request, "post_new.html", {})
-    pass

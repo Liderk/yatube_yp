@@ -30,7 +30,7 @@ def group_posts(request, slug):
 # в settings.LOGIN_URL. Если авторизован, то выполняется код представления
 def new_post(request):
     if request.method == 'POST':
-        form = UserCreateNewPost(request.POST)
+        form = UserCreateNewPost(request.POS)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -58,15 +58,18 @@ def post_view(request, username, post_id):
 
 
 def post_edit(request, username, post_id):
-    author = get_object_or_404(User, username=username)
-    post = Post.objects.get(author=author, id=post_id)
-    form = UserCreateNewPost(request.POST)
-    if form.is_valid():
-        post.text = post
-        post = form.save(commit=False)
-        post.author = request.user
-        post.save()
-    return render(request, "edit.html", {})
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = UserCreateNewPost(request.POS)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('index')
+        return render(request, 'new_post.html', {'form': form})
+    form = UserCreateNewPost(instance=post)
+    return render(request, 'new_post.html', {'form': form})
+
     # тут тело функции. Не забудьте проверить,
     # что текущий пользователь — это автор записи.
     # В качестве шаблона страницы редактирования укажите шаблон создания новой записи

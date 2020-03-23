@@ -43,17 +43,18 @@ def new_post(request):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=author).all()
+    posts = Post.objects.filter(author=author).order_by("-pub_date").all()
     paginator = Paginator(posts, 3)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "profile.html", {'author': author, 'page': page, })
+    return render(request, "profile.html", {'author': author, 'page': page, 'paginator': paginator})
 
 
 def post_view(request, username, post_id):
-    # тут тело функции
-    # return render(request, "post.html", {})
-    pass
+    author = get_object_or_404(User, username=username)
+    post = Post.objects.get(author=author, id=post_id)
+    return render(request, "post.html", {'post': post, 'author': author,})
+
 
 
 def post_edit(request, username, post_id):

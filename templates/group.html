@@ -8,13 +8,11 @@
 
 {% block content %}
   {% for post in page %}
-        {% block for %}
           <h3>
               Автор: {{ post.author.get_full_name }} Дата публикации: {{ post.pub_date|date:"d M Y" }}
           </h3>
           <p>{{ post.text|linebreaksbr }}</p>
           <hr>
-        {% endblock for %}
   {% endfor %}
 
     {% if page.has_other_pages %}

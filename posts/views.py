@@ -42,10 +42,12 @@ def new_post(request):
 
 
 def profile(request, username):
-    author = User.objects.get(username=username)
+    author = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author=author).all()
-
-    return render(request, "profile.html", {'posts': posts})
+    paginator = Paginator(posts, 3)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, "profile.html", {'author': author, 'page': page, })
 
 
 def post_view(request, username, post_id):

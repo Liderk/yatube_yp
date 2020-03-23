@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Профиль пользователя "ТУТ ДОЛЖЕН СТОЯТЬ ШАБЛОН ИМЕНИ АВТОРА {% endblock %}
 {% block content %}
-    {% for post in posts %}
+
         <main role="main" class="container">
             <div class="row">
+
                     <div class="col-md-3 mb-3 mt-1">
                             <div class="card">
                                     <div class="card-body">
                                             <div class="h2">
-                                                <!-- Имя автора -->
-                                                {{ post.author.get_full_name }}
+                                                <!-- Имя автора done -->
+                                                {{ author.get_full_name }}
                                             </div>
                                             <div class="h3 text-muted">
-                                                 <!-- username автора -->
-                                                 {{ post.author.username }}
+                                                 <!-- username автора done -->
+                                                 {{ author.username }}
                                             </div>
                                     </div>
                                     <ul class="list-group list-group-flush">
@@ -25,9 +26,9 @@
                                             </li>
                                             <li class="list-group-item">
                                                     <div class="h6 text-muted">
-                                                        <!-- Количество записей -->
+                                                        <!-- Количество записей done-->
                                                         Колличество постов
-                                                        {{posts|length }}
+                                                        {{page.paginator.count }}
 
                                                     </div>
                                             </li>
@@ -38,11 +39,12 @@
                     <div class="col-md-9">
 
                         <!-- Начало блока с отдельным постом -->
+                        {% for post in page %}
                             <div class="card mb-3 mt-1 shadow-sm">
                                     <div class="card-body">
                                             <p class="card-text">
                                                     <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
-                                                    <a href="/leo/"><strong class="d-block text-gray-dark">@leo</strong></a>
+                                                    <a href="{{post.author.username}}"><strong class="d-block text-gray-dark">@{{post.author.username}}</strong></a>
                                                     <!-- Текст поста -->
                                                     {{post.text}}
                                             </p>
@@ -54,17 +56,20 @@
                                                             <a class="btn btn-sm text-muted" href="/leo/37/edit" role="button">Редактировать</a>
                                                     </div>
 
-                                                    <small class="text-muted">{{post.pub_date}}</small>
+                                                    <small class="text-muted">{{post.pub_date|date:"d M Y" }}</small>
                                             </div>
                                     </div>
                             </div>
+                        {% endfor %}
                         <!-- Конец блока с отдельным постом -->
 
                         <!-- Остальные посты -->
 
-                        <!-- Здесь постраничная навигация паджинатора -->
+                {% if page.has_other_pages %}
+                    {% include "paginator.html" with items=page paginator=paginator%}
+                {% endif %}
              </div>
             </div>
         </main>
-    {% endfor %}
+
 {% endblock content %}

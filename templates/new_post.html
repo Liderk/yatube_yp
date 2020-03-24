@@ -1,13 +1,27 @@
 {% extends "base.html" %}
-{% block title %} Создание нового поста{% endblock %}
+
+    {% block title %} {% if post %} Редактировать запись {% else %} Добавить запись {% endif %} {% endblock %}
 
 {% block content %}
-   <form method="post">
-        {% csrf_token %}
-        <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
-        <p>{{ form.text }} введите текст поста </p>
-        <button type="submit" class="btn btn-primary" >Опубликовать пост </button>
+    {% if post %}
+           <form method="post">
+                {% csrf_token %}
+                   <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
+                   <p>{{ form.text }}  </p>
+                   <button type="submit" class="btn btn-primary" >Сохранить</button>
 
+           </form>
 
-   </form>
+    {% else %}
+
+           <form method="post">
+                {% csrf_token %}
+                   <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
+                   <p>{{ form.text }} </p>
+                   <button type="submit" class="btn btn-primary" >Добавить</button>
+
+           </form>
+    {% endif %}
 {% endblock %}
+
+

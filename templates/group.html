@@ -9,7 +9,7 @@
 {% block content %}
   {% for post in page %}
           <h3>
-              Автор: {{ post.author.get_full_name }} Дата публикации: {{ post.pub_date|date:"d M Y" }}
+            Автор: <a href="/user/{{post.author.username}}"><strong class="p-2 text-dark"> {{ post.author.get_full_name }}</strong></a>  Дата публикации: {{ post.pub_date|date:"d M Y" }}
           </h3>
           <p>{{ post.text|linebreaksbr }}</p>
           <hr>

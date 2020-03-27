@@ -25,6 +25,7 @@ def group_posts(request, slug):
     return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
 
 
+
 @login_required
 # исползуем декоратор, если пользователь не авторизован, то перенаправляем его login.html по адресу прописанном
 # в settings.LOGIN_URL. Если авторизован, то выполняется код представления

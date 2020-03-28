@@ -1,33 +1,73 @@
-# from django.test import TestCase
-#
-#
-# # Create your tests here.
-#
-# class TestStringMethods(TestCase):
-#     def test_length(self):
-#         self.assertEqual(len("yatube"), 6)
-#
-#     def test_show_msg(self):
-#         # действительно ли первый аргумент — True?
-#         self.assertTrue(False, msg="Важная проверка на истинность")
 from django.test import TestCase, Client
-import datetime as dt
+from .models import User, Post
 
 
-class PlansTest(TestCase):
+class UserPostTest(TestCase):
+
     def setUp(self):
         self.client = Client()
+        self.user = User.objects.create_user(first_name='Obi-Wan',
+                                             last_name='Kenobi',
+                                             username='ben',
+                                             email='ben.kenobi@jedi.korusant',
+                                             password='OnlyASithDealsInAbsolutes')
+        self.post = Post.objects.create(
+            text="Who is more stupid: the fool or the fool, who follows him?",
+            author=self.user, )
 
-    def test_access(self):
-        response = self.client.get("")
-        self.assertEqual(response.status_code, 200)
+    def test_profile(self):
+        response = self.client.get(f'/{self.user.username}/')
+        self.assertEqual(response.status_code, 200, msg="Не удается получить профиль пользователя")
+
+    def test_user_create_post(self):
+        c = self.client
+        login = c.post('/auth/login/', {'username': 'ben', 'password': 'OnlyASithDealsInAbsolutes'})
+        self.assertEqual(login.status_code, 302, msg="Не удается войти в учетную запись")
+        c.post('/new/', {'text': 'test text', })
+        post = Post.objects.filter(text__contains='test text')
+        self.assertTrue(post, msg="Пост не опубликован")
+
+    def test_redirect_not_authorized_user(self):
         response = self.client.get("/new/")
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/auth/login/?next=%2Fnew%2F',
+                             status_code=302,
+                             target_status_code=200,
+                             msg_prefix='неавторизованный пользователь не пренаправлен на страницу авторизации',)
 
-    def test_context_plans(self):
-        response = self.client.get('')
-        self.assertIn('posts', response.context)
+    def test_contain_post_in_index_profile_post(self):
+        c = self.client
+        post = Post.objects.get(text__contains='Who is more stupid')
+        response = c.get("/")
+        self.assertContains(response, 'Who is more stupid',
+                            status_code=200,
+                            msg_prefix='пост не опубликован на главной странице',
+                            html=False)
+        response = c.get(f'/{self.user.username}/')
+        self.assertContains(response, 'Who is more stupid',
+                            status_code=200,
+                            msg_prefix='пост не опубликован в профиле ползователя',
+                            html=False)
+        response = c.get(f'/{self.user.username}/{post.id}/')
+        self.assertContains(response, 'Who is more stupid', status_code=200,
+                            msg_prefix='пост не появился на отдельной странице поста',
+                            html=False)
 
-    def test_template(self):
-        response = self.client.get('')
-        self.assertTemplateUsed(response, 'index.html')
+    def test_try_edit_post(self):
+        c = self.client
+        self.client.login(username='ben', password='OnlyASithDealsInAbsolutes')
+        c.post(f'/{self.user.username}/{self.post.id}/edit', {'text': 'Changed text', })
+        response = c.get("/")
+        self.assertContains(response, 'Changed text',
+                            status_code=200,
+                            msg_prefix='редактируемый пост не опубликован на главной странице',
+                            html=False)
+        response = c.get(f'/{self.user.username}/')
+        self.assertContains(response, 'Changed text',
+                            status_code=200,
+                            msg_prefix='редактируемый пост не опубликован в профиле ползователя',
+                            html=False)
+        response = c.get(f'/{self.user.username}/{self.post.id}/')
+        self.assertContains(response, 'Changed text',
+                            status_code=200,
+                            msg_prefix='редактируемый пост не появился на отдельной странице поста',
+                            html=False)

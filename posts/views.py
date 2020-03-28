@@ -59,15 +59,19 @@ def post_view(request, username, post_id):
 
 
 def post_edit(request, username, post_id):
+    author = User.objects.get(username=username)
     post = get_object_or_404(Post, id=post_id)
-    if request.method == 'POST':
-        form = UserCreateNewPost(request.POST,  instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('index')
-        return render(request, 'new_post.html', {'form': form})
-    form = UserCreateNewPost(instance=post)
-    return render(request, 'new_post.html', {'form': form, 'post': post})
+    if request.user == author:
+        if request.method == 'POST':
+            form = UserCreateNewPost(request.POST,  instance=post)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = request.user
+                post.save()
+                return redirect('index')
+            return render(request, 'new_post.html', {'form': form})
+        form = UserCreateNewPost(instance=post)
+        return render(request, 'new_post.html', {'form': form, 'post': post})
+    posts_count = Post.objects.filter(author=author)
+    return render(request, 'post.html', {'post': post, 'posts_count': posts_count})
 

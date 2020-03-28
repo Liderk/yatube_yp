@@ -18,8 +18,7 @@ from django.urls import include, path
 from django.contrib.flatpages import views
 
 urlpatterns = [
-        # обработчик для главной страницы ищем в urls.py приложения posts
-        path("", include("posts.urls")),
+
 
         # flatpages
         path("about/", include("django.contrib.flatpages.urls")),
@@ -33,13 +32,21 @@ urlpatterns = [
 
         # раздел администратора
         path("admin/", admin.site.urls),
-]
 
-# добавим новые пути
-urlpatterns += [
         path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
         path('terms/', views.flatpage, {'url': '/terms/'}, name='terms'),
         path('about-author/', views.flatpage, {'url': '/about-author/'}, name='about-author'),
         path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='about-spec'),
 
+        # обработчик для главной страницы ищем в urls.py приложения posts
+        path("", include("posts.urls")),
 ]
+
+# добавим новые пути
+# urlpatterns += [
+#         path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
+#         path('terms/', views.flatpage, {'url': '/terms/'}, name='terms'),
+#         path('about-author/', views.flatpage, {'url': '/about-author/'}, name='about-author'),
+#         path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='about-spec'),
+#
+# ]

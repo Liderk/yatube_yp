@@ -48,30 +48,31 @@ def profile(request, username):
     paginator = Paginator(posts, 3)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "profile.html", {'author': author, 'page': page, })
+    return render(request, "profile.html", {'author': author, 'page': page, 'paginator': paginator})
 
 
 def post_view(request, username, post_id):
     author = get_object_or_404(User, username=username)
     post = Post.objects.get(id=post_id)
     posts_count = Post.objects.filter(author=author)
-    return render(request, "post.html", {'post': post, 'posts_count': posts_count})
+    return render(request, "post.html", {'post': post, 'posts_count': posts_count, 'author': author})
 
-
+@login_required
 def post_edit(request, username, post_id):
     author = User.objects.get(username=username)
     post = get_object_or_404(Post, id=post_id)
-    if request.user == author:
+    if request.user == post.author:
         if request.method == 'POST':
             form = UserCreateNewPost(request.POST,  instance=post)
             if form.is_valid():
                 post = form.save(commit=False)
                 post.author = request.user
                 post.save()
-                return redirect('index')
+                return redirect(f'/{username}/{post_id}/', pk=post_id)
             return render(request, 'new_post.html', {'form': form})
         form = UserCreateNewPost(instance=post)
         return render(request, 'new_post.html', {'form': form, 'post': post})
     posts_count = Post.objects.filter(author=author)
     return render(request, 'post.html', {'post': post, 'posts_count': posts_count})
+
 

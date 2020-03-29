@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from .models import User, Post
+from .models import User, Post, Group
 
 
 class UserPostTest(TestCase):
@@ -36,7 +36,6 @@ class UserPostTest(TestCase):
 
     def test_contain_post_in_index_profile_post(self):
         c = self.client
-        post = Post.objects.get(text__contains='Who is more stupid')
         response = c.get("/")
         self.assertContains(response, 'Who is more stupid',
                             status_code=200,
@@ -47,15 +46,15 @@ class UserPostTest(TestCase):
                             status_code=200,
                             msg_prefix='пост не опубликован в профиле ползователя',
                             html=False)
-        response = c.get(f'/{self.user.username}/{post.id}/')
+        response = c.get(f'/{self.user.username}/{self.post.id}/')
         self.assertContains(response, 'Who is more stupid', status_code=200,
                             msg_prefix='пост не появился на отдельной странице поста',
                             html=False)
 
     def test_try_edit_post(self):
         c = self.client
-        self.client.login(username='ben', password='OnlyASithDealsInAbsolutes')
-        c.post(f'/{self.user.username}/{self.post.id}/edit', {'text': 'Changed text', })
+        c.force_login(self.user)
+        c.post(f'/{self.user.username}/{self.post.id}/edit/', {'text': 'Changed text', })
         response = c.get("/")
         self.assertContains(response, 'Changed text',
                             status_code=200,
@@ -71,3 +70,4 @@ class UserPostTest(TestCase):
                             status_code=200,
                             msg_prefix='редактируемый пост не появился на отдельной странице поста',
                             html=False)
+

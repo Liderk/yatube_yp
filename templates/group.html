@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %} Записи сообщества {{group.title}} | Yatube {% endblock %}
 
-{%block description%}
-    <h1>{{group.title|title}}</h1>
-    <h2>{{group.description}}</h2>
-{% endblock %}
+
+
+
 
 {% block content %}
+{% csrf_token %}
+<h1>{{group.title}}</h1>
+<p>{{group.description}}</p>
   {% for post in page %}
           <h3>
             Автор: <a href="/{{post.author.username}}"><strong class="p-2 text-dark"> {{ post.author.get_full_name }}</strong></a>  Дата публикации: {{ post.pub_date|date:"d M Y" }}

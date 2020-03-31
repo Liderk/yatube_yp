@@ -35,8 +35,9 @@ def new_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            post_last = Post.objects.get(text=post.text, pub_date=post.pub_date)
-            return redirect("post", username=request.user, post_id=post_last.id)
+            # post_last = Post.objects.get(text=post.text, pub_date=post.pub_date)
+            # return redirect("post", username=request.user, post_id=post_last.id)
+            return redirect('index')
         return render(request, 'new_post.html', {'form': form})
     form = UserCreateNewPost()
     return render(request, 'new_post.html', {'form': form})

@@ -3,7 +3,7 @@ from .models import User, Post, Group
 from django.urls import reverse
 
 
-class UserPostTest(TestCase):
+class UsersExpirenceWorkWithPostTest(TestCase):
 
     def setUp(self):
         self.client = Client()

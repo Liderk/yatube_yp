@@ -25,7 +25,6 @@ def group_posts(request, slug):
     return render(request, "group.html", {"group": group, 'page': page, 'paginator': paginator})
 
 
-
 @login_required
 # исползуем декоратор, если пользователь не авторизован, то перенаправляем его login.html по адресу прописанном
 # в settings.LOGIN_URL. Если авторизован, то выполняется код представления
@@ -36,7 +35,8 @@ def new_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('index')
+            post_last = Post.objects.get(text=post.text, pub_date=post.pub_date)
+            return redirect("post", username=request.user, post_id=post_last.id)
         return render(request, 'new_post.html', {'form': form})
     form = UserCreateNewPost()
     return render(request, 'new_post.html', {'form': form})
@@ -57,22 +57,18 @@ def post_view(request, username, post_id):
     posts_count = Post.objects.filter(author=author)
     return render(request, "post.html", {'post': post, 'posts_count': posts_count, 'author': author})
 
+
 @login_required
 def post_edit(request, username, post_id):
     author = User.objects.get(username=username)
-    post = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(Post, id=post_id, author=author)
     if request.user == post.author:
         if request.method == 'POST':
-            form = UserCreateNewPost(request.POST,  instance=post)
+            form = UserCreateNewPost(request.POST, instance=post)
             if form.is_valid():
-                post = form.save(commit=False)
-                post.author = request.user
                 post.save()
-                return redirect(f'/{username}/{post_id}/', pk=post_id)
+                return redirect("post", username, post_id)
             return render(request, 'new_post.html', {'form': form})
         form = UserCreateNewPost(instance=post)
         return render(request, 'new_post.html', {'form': form, 'post': post})
-    posts_count = Post.objects.filter(author=author)
-    return render(request, 'post.html', {'post': post, 'posts_count': posts_count})
-
-
+    return redirect("post", username, post_id)

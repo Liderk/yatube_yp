@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from .models import User, Post, Group
+from django.urls import reverse
 
 
 class UserPostTest(TestCase):
@@ -54,18 +55,18 @@ class UserPostTest(TestCase):
     def test_try_edit_post(self):
         c = self.client
         c.force_login(self.user)
-        c.post(f'/{self.user.username}/{self.post.id}/edit/', {'text': 'Changed text', })
+        c.post(reverse('post_edit', args=[self.user.username, self.post.id],), {'text': 'Changed text', })
         response = c.get("/")
         self.assertContains(response, 'Changed text',
                             status_code=200,
                             msg_prefix='редактируемый пост не опубликован на главной странице',
                             html=False)
-        response = c.get(f'/{self.user.username}/')
+        response = c.get(reverse('profile', args=[self.user.username]))
         self.assertContains(response, 'Changed text',
                             status_code=200,
                             msg_prefix='редактируемый пост не опубликован в профиле ползователя',
                             html=False)
-        response = c.get(f'/{self.user.username}/{self.post.id}/')
+        response = c.get(reverse('post', args=[self.user.username, self.post.id],))
         self.assertContains(response, 'Changed text',
                             status_code=200,
                             msg_prefix='редактируемый пост не появился на отдельной странице поста',

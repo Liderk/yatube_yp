@@ -4,20 +4,22 @@
 
 {% block content %}
     {% if post %}
-           <form method="post">
+           <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                    <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
                    <p>{{ form.text }}  </p>
+                   <p>{{ form.image }}  </p>
                    <button type="submit" class="btn btn-primary" >Сохранить</button>
 
            </form>
 
     {% else %}
 
-           <form method="post">
+           <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                    <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
                    <p>{{ form.text }} </p>
+                    <p>{{ form.image }}  </p>
                    <button type="submit" class="btn btn-primary" >Добавить</button>
 
            </form>

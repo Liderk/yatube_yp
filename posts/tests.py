@@ -72,3 +72,7 @@ class UsersExpirenceWorkWithPostTest(TestCase):
                             msg_prefix='редактируемый пост не появился на отдельной странице поста',
                             html=False)
 
+    def test_try_404(self):
+        c = self.client
+        response = self.client.get(f'/r2d2/')
+        self.assertEqual(response.status_code, 404, msg="Не возвращается ошибка 404")

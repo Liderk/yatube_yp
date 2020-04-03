@@ -47,8 +47,9 @@ class UsersExpirenceWorkWithPostTest(TestCase):
                             status_code=200,
                             msg_prefix='пост не опубликован в профиле ползователя',
                             html=False)
-        response = c.get(f'/{self.user.username}/{self.post.id}/')
-        self.assertContains(response, 'Who is more stupid', status_code=200,
+        response = c.get(f'/{self.user.username}/')
+        self.assertContains(response, 'Who is more stupid',
+                            status_code=200,
                             msg_prefix='пост не появился на отдельной странице поста',
                             html=False)
 
@@ -66,7 +67,7 @@ class UsersExpirenceWorkWithPostTest(TestCase):
                             status_code=200,
                             msg_prefix='редактируемый пост не опубликован в профиле ползователя',
                             html=False)
-        response = c.get(reverse('post', args=[self.user.username, self.post.id], ))
+        response = c.get(reverse('add_comment', args=[self.user.username, self.post.id], ))
         self.assertContains(response, 'Changed text',
                             status_code=200,
                             msg_prefix='редактируемый пост не появился на отдельной странице поста',
@@ -94,7 +95,7 @@ class ImagePostTest(TestCase):
                                                                     'group': self.group.id})
 
     def test_use_img_tag(self):
-        response = self.client.get(reverse('post', args=[self.user.username, self.post.id], ))
+        response = self.client.get(reverse('add_comment', args=[self.user.username, self.post.id], ))
         self.assertContains(response, '<img', status_code=200,
                             msg_prefix='Изображение отсутствует в посте', )
 
@@ -106,13 +107,13 @@ class ImagePostTest(TestCase):
         self.assertContains(response_group, '<img', status_code=200,
                             msg_prefix='Изображение отсутствует на странице группы', )
         response_index = self.client.get(reverse("index"))
-        self.assertContains(response_index, '.jpg', status_code=200,
+        self.assertContains(response_index, '<img', status_code=200,
                             msg_prefix='Изображение отсутствует на главной странице', )
 
     def test_protection_to_load_any_type_file_instead_image(self):
         with open('./media/test.txt', 'rb') as img:
             self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': img,
                                                                     'group': self.group.id})
-        response = self.client.get(reverse('post', args=[self.user.username, self.post.id], ))
+        response = self.client.get(reverse('add_comment', args=[self.user.username, self.post.id], ))
         self.assertNotContains(response, '.txt', status_code=200,
                                msg_prefix='Возможно загрузить не изображение', )

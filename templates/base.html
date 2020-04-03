@@ -13,9 +13,11 @@
     <body>
         {% include 'nav.html' %}
         <main>
+
             <div class="container">
                 <!-- Описание страницы -->
                 {% block content %}
+                {% block desription %} {% endblock %}
                 <!-- Содержимое страницы -->
                 {% endblock content %}
             </div>

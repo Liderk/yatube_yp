@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
-from .models import Post, User, Group
+from .models import Post, User, Group, Comment
 from django.shortcuts import render
 from django.shortcuts import redirect
-from .forms import UserCreateNewPost
+from .forms import UserCreateNewPost, CommentForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
@@ -51,10 +51,7 @@ def profile(request, username):
 
 
 def post_view(request, username, post_id):
-    author = get_object_or_404(User, username=username)
-    post = get_object_or_404(Post, id=post_id)
-    posts_count = Post.objects.filter(author=author)
-    return render(request, "post.html", {'post': post, 'posts_count': posts_count, 'author': author})
+    return redirect("add_comment", username=username, post_id=post_id)
 
 
 @login_required
@@ -81,3 +78,22 @@ def page_not_found(request, exception):
 
 def server_error(request):
     return render(request, "misc/500.html", status=500)
+
+
+@login_required
+def add_comment(request, username, post_id):
+    author = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, id=post_id, author=author)
+    comments = Comment.objects.filter(post_id=post,).all()
+    posts_count = Post.objects.filter(author=author)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect("add_comment", username, post_id)
+        return render(request, 'post.html',  {'form': form, 'post': post, 'comments': comments, 'posts_count': posts_count})
+    form = CommentForm()
+    return render(request, 'post.html', {'form': form, 'post': post, 'comments': comments,'posts_count': posts_count})

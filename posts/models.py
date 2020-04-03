@@ -1,4 +1,3 @@
-
 from django.db import models
 
 from django.contrib.auth import get_user_model
@@ -27,8 +26,9 @@ class Post(models.Model):
         # выводим текст поста
         return self.text
 
+
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="posts_comment")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comment_author")
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True, db_index=True)

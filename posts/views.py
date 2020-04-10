@@ -1,24 +1,25 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 
 from .models import Post, User, Group, Comment
-from django.shortcuts import render
 from django.shortcuts import redirect
 from .forms import UserCreateNewPost, CommentForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.decorators.cache import cache_page
 
 
+# @cache_page(60 * 15)
 def index(request):
     post_list = Post.objects.order_by("-pub_date").all()
-    paginator = Paginator(post_list, 10)  # показывать по 10 записей на странице.
+    paginator = Paginator(post_list, 3)  # показывать по 10 записей на странице.
     page_number = request.GET.get('page')  # переменная в URL с номером запрошенной страницы
     page = paginator.get_page(page_number)  # получить записи с нужным смещением
     return render(request, 'index.html', {'page': page, 'paginator': paginator})
 
-
+# @cache_page(60 * 15)
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.filter(group=group).order_by("-pub_date").all()
+    posts = get_list_or_404(Post.objects.order_by("-pub_date").all(), group=group)
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -40,7 +41,7 @@ def new_post(request):
     form = UserCreateNewPost()
     return render(request, 'new_post.html', {'form': form})
 
-
+# @cache_page(60 * 15)
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author=author).order_by("-pub_date").all()
@@ -48,10 +49,6 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return render(request, "profile.html", {'author': author, 'page': page, 'paginator': paginator})
-
-
-def post_view(request, username, post_id):
-    return redirect("add_comment", username=username, post_id=post_id)
 
 
 @login_required
@@ -80,12 +77,18 @@ def server_error(request):
     return render(request, "misc/500.html", status=500)
 
 
-@login_required
-def add_comment(request, username, post_id):
+def post_view(request, username, post_id):
     author = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, id=post_id, author=author)
-    comments = Comment.objects.filter(post_id=post,).all()
+    comments = Comment.objects.filter(post_id=post, ).all()
     posts_count = Post.objects.filter(author=author)
+    form = CommentForm
+    return render(request, 'post.html', {'form': form, 'post': post, 'comments': comments, 'posts_count': posts_count})
+
+
+@login_required
+def add_comment(request, username, post_id):
+    post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -93,7 +96,4 @@ def add_comment(request, username, post_id):
             comment.post = post
             comment.author = request.user
             comment.save()
-            return redirect("add_comment", username, post_id)
-        return render(request, 'post.html',  {'form': form, 'post': post, 'comments': comments, 'posts_count': posts_count})
-    form = CommentForm()
-    return render(request, 'post.html', {'form': form, 'post': post, 'comments': comments,'posts_count': posts_count})
+    return redirect("post", username, post_id)

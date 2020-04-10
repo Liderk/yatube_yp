@@ -1,6 +1,7 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from .models import User, Post, Group
 from django.urls import reverse
+import time
 
 
 class UsersExpirenceWorkWithPostTest(TestCase):
@@ -35,6 +36,7 @@ class UsersExpirenceWorkWithPostTest(TestCase):
                              target_status_code=200,
                              msg_prefix='неавторизованный пользователь не пренаправлен на страницу авторизации', )
 
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache', }})
     def test_contain_post_in_index_profile_post(self):
         c = self.client
         response = c.get("/")
@@ -53,6 +55,7 @@ class UsersExpirenceWorkWithPostTest(TestCase):
                             msg_prefix='пост не появился на отдельной странице поста',
                             html=False)
 
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache', }})
     def test_try_edit_post(self):
         c = self.client
         c.force_login(self.user)
@@ -67,7 +70,7 @@ class UsersExpirenceWorkWithPostTest(TestCase):
                             status_code=200,
                             msg_prefix='редактируемый пост не опубликован в профиле ползователя',
                             html=False)
-        response = c.get(reverse('add_comment', args=[self.user.username, self.post.id], ))
+        response = c.get(reverse('post', args=[self.user.username, self.post.id], ))
         self.assertContains(response, 'Changed text',
                             status_code=200,
                             msg_prefix='редактируемый пост не появился на отдельной странице поста',
@@ -95,10 +98,11 @@ class ImagePostTest(TestCase):
                                                                     'group': self.group.id})
 
     def test_use_img_tag(self):
-        response = self.client.get(reverse('add_comment', args=[self.user.username, self.post.id], ))
+        response = self.client.get(reverse('post', args=[self.user.username, self.post.id], ))
         self.assertContains(response, '<img', status_code=200,
                             msg_prefix='Изображение отсутствует в посте', )
 
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache', }})
     def test_image_in_profile_group_index(self):
         response_profile = self.client.get(reverse('profile', args=[self.user.username]))
         self.assertContains(response_profile, '<img', status_code=200,
@@ -114,6 +118,37 @@ class ImagePostTest(TestCase):
         with open('./media/test.txt', 'rb') as img:
             self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': img,
                                                                     'group': self.group.id})
-        response = self.client.get(reverse('add_comment', args=[self.user.username, self.post.id], ))
+        response = self.client.get(reverse('post', args=[self.user.username, self.post.id], ))
         self.assertNotContains(response, '.txt', status_code=200,
                                msg_prefix='Возможно загрузить не изображение', )
+
+
+class CachePostTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(first_name='Obi-Wan',
+                                             last_name='Kenobi',
+                                             username='ben',
+                                             email='ben.kenobi@jedi.korusant',
+                                             password='OnlyASithDealsInAbsolutes')
+        self.post = Post.objects.create(
+            text="You were my brother, Anakin. I loved you.",
+            author=self.user, )
+
+    def test_index_cache_20(self):
+        c = self.client
+        c.force_login(self.user)
+        c.get("/")
+        c.post(reverse('post_edit', args=[self.user.username, self.post.id], ), {'text': 'Changed text', })
+        response = c.get("/")
+        self.assertNotContains(response, 'Changed text',
+                               status_code=200,
+                               msg_prefix='Кеширование не работает.',
+                               html=False)
+        time.sleep(25)
+        response = c.get("/")
+        self.assertContains(response, 'Changed text',
+                            status_code=200,
+                            msg_prefix='После 25 секунд продолжает выдаваться запись из кеша.',
+                            html=False)

@@ -4,12 +4,14 @@
 {% block content %}
     <div class="container">
         {% block desription %} <h1> Последние обновления на сайте</h1>{% endblock %}
-
-            <!-- Вывод ленты записей -->
-                {% for post in page %}
-                  <!-- Вот он, новый include! -->
-                    {% include "post_item.html" with post=post %}
-                {% endfor %}
+            {% load cache %}
+                {% cache 20 index_page page %}
+                <!-- Вывод ленты записей -->
+                    {% for post in page %}
+                      <!-- Вот он, новый include! -->
+                        {% include "post_item.html" with post=post %}
+            {% endfor %}
+            {% endcache %}
     </div>
 
         <!-- Вывод паджинатора -->

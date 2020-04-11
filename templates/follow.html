@@ -1,0 +1,10 @@
+{% extends "index.html" %}
+{% block title %} Подписки {% endblock %}
+
+{% block desription %}
+        {% if follower %}
+            <h1> Последние обновления в подписках</h1>
+        {% else %}
+            <h1> У вас еще нет подписок</h1>
+        {% endif %}
+{% endblock %}

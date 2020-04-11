@@ -3,6 +3,7 @@
 
 {% block content %}
     <div class="container">
+        {% include "menu.html" with index=True %}
         {% block desription %} <h1> Последние обновления на сайте</h1>{% endblock %}
             {% load cache %}
                 {% cache 20 index_page page %}

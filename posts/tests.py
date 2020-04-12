@@ -1,5 +1,5 @@
 from django.test import TestCase, Client, override_settings
-from .models import User, Post, Group
+from .models import User, Post, Group, Comment
 from django.urls import reverse
 import time
 
@@ -152,3 +152,77 @@ class CachePostTest(TestCase):
                             status_code=200,
                             msg_prefix='После 25 секунд продолжает выдаваться запись из кеша.',
                             html=False)
+
+
+class FollowPostTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.user_1 = User.objects.create_user(first_name='astra',
+                                               last_name='droid',
+                                               username='r2d2',
+                                               email='piupipiu@droid.tatuin',
+                                               password='piupiupipi')
+        self.post = Post.objects.create(
+            text="piu pi pi piu piu pi pi pi",
+            author=self.user_1, )
+
+        self.user_2 = User.objects.create_user(first_name='c3po',
+                                               last_name='droid',
+                                               username='c3po',
+                                               email='c3pio@droid.tatuin',
+                                               password='OnlyASithDealsInAbsolutes')
+
+        self.user_3 = User.objects.create_user(first_name='chubaka',
+                                               last_name='chubaka',
+                                               username='chubaka',
+                                               email='wooki@wooki.wooki',
+                                               password='aaaagrh')
+
+    def test_following_and_unfollowing(self):
+        c = self.client
+        c.force_login(self.user_2)
+        c.get(f"/{self.user_1}/follow/")
+        response = c.get(reverse("follow_index", ))
+        self.assertContains(response, 'piu pi pi piu piu pi pi pi',
+                            status_code=200,
+                            msg_prefix='Не происходит подписки на пользователя.',
+                            html=False)
+        c.post(reverse("profile_unfollow", args=[self.user_1], ))
+        response = c.get(reverse("follow_index", ))
+        self.assertContains(response, ' У вас еще нет подписок',
+                            status_code=200,
+                            msg_prefix='Не происходит отписки от пользователя.',
+                            html=False)
+
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache', }})
+    def test_new_post_in_following(self):
+        c = self.client
+        c.force_login(self.user_2)
+        c.get(f"/{self.user_1}/follow/")
+        self.post = Post.objects.create(
+            text="piu pi test text pi piu",
+            author=self.user_1, )
+        c.force_login(self.user_2)
+        response = c.get(reverse("follow_index", ))
+        self.assertContains(response, 'piu pi test text pi piu',
+                            status_code=200,
+                            msg_prefix='Не появляется текст нового поста  ленте подписок.',
+                            html=False)
+        c.logout()
+        c.force_login(self.user_3)
+        response = c.get(reverse("follow_index", ))
+        self.assertNotContains(response, 'piu pi test text pi piu',
+                            status_code=200,
+                            msg_prefix='Появляется тест нового поста от автора, на которого нет подписки',
+                            html=False)
+
+    def test_post_comment(self):
+        c = self.client
+        c.post(reverse('add_comment', args=[self.user_1.username, self.post.id], ), {'text': 'test text', })
+        comment = Comment.objects.filter(text__contains='test text')
+        self.assertFalse(comment, msg="комментарий может быть создан неавторизованным пользователем")
+        c.force_login(self.user_1)
+        c.post(reverse('add_comment', args=[self.user_1.username, self.post.id], ), {'text': 'test text', })
+        comment = Comment.objects.filter(text__contains='test text')
+        self.assertTrue(comment, msg="комментарий не создается авторизованным пользователем")

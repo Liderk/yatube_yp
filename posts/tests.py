@@ -1,7 +1,9 @@
 from django.test import TestCase, Client, override_settings
 from .models import User, Post, Group, Comment
 from django.urls import reverse
-import time
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.cache import cache
+
 
 
 class UsersExpirenceWorkWithPostTest(TestCase):
@@ -93,9 +95,13 @@ class ImagePostTest(TestCase):
                                              password='OnlyASithDealsInAbsolutes')
         self.post = Post.objects.create(text=self.message, author=self.user, )
         self.client.force_login(self.user)
-        with open('./media/posts/ben_test.jpg', 'rb') as img:
-            self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': img,
-                                                                    'group': self.group.id})
+        self.image = SimpleUploadedFile(name='ben_test.jpg', content=open('./media/posts/ben_test.jpg', 'rb').read(),
+                                        content_type='image/jpeg')
+        # with open('./media/posts/ben_test.jpg', 'rb') as img:
+        #     self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': img,
+        #                                                             'group': self.group.id})
+        self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': self.image,
+                                                                'group': self.group.id})
 
     def test_use_img_tag(self):
         response = self.client.get(reverse('post', args=[self.user.username, self.post.id], ))
@@ -144,13 +150,13 @@ class CachePostTest(TestCase):
         response = c.get("/")
         self.assertNotContains(response, 'Changed text',
                                status_code=200,
-                               msg_prefix='Кеширование не работает.',
+                               msg_prefix='Изменение отображается, кеширование не работает',
                                html=False)
-        time.sleep(25)
+        cache.clear()
         response = c.get("/")
         self.assertContains(response, 'Changed text',
                             status_code=200,
-                            msg_prefix='После 25 секунд продолжает выдаваться запись из кеша.',
+                            msg_prefix='Изменение не отображается, кеш не очищается.',
                             html=False)
 
 
@@ -179,6 +185,7 @@ class FollowPostTest(TestCase):
                                                email='wooki@wooki.wooki',
                                                password='aaaagrh')
 
+    @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache', }})
     def test_following_and_unfollowing(self):
         c = self.client
         c.force_login(self.user_2)
@@ -213,9 +220,9 @@ class FollowPostTest(TestCase):
         c.force_login(self.user_3)
         response = c.get(reverse("follow_index", ))
         self.assertNotContains(response, 'piu pi test text pi piu',
-                            status_code=200,
-                            msg_prefix='Появляется тест нового поста от автора, на которого нет подписки',
-                            html=False)
+                               status_code=200,
+                               msg_prefix='Появляется тест нового поста от автора, на которого нет подписки',
+                               html=False)
 
     def test_post_comment(self):
         c = self.client

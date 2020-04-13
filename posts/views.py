@@ -49,7 +49,7 @@ def profile(request, username):
     page = paginator.get_page(page_number)
     following = Follow.objects.filter(author=author, user=request.user.id)
     return render(request, "profile.html",
-                  {'author': author, 'page': page, 'paginator': paginator, 'following': following,})
+                  {'author': author, 'page': page, 'paginator': paginator, 'following': following, 'user': request.user.id})
 
 
 @login_required

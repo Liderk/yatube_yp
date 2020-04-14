@@ -97,9 +97,7 @@ class ImagePostTest(TestCase):
         self.client.force_login(self.user)
         self.image = SimpleUploadedFile(name='ben_test.jpg', content=open('./media/posts/ben_test.jpg', 'rb').read(),
                                         content_type='image/jpeg')
-        # with open('./media/posts/ben_test.jpg', 'rb') as img:
-        #     self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': img,
-        #                                                             'group': self.group.id})
+
         self.client.post(f'/{self.user}/{self.post.id}/edit/', {'text': 'text_change', 'image': self.image,
                                                                 'group': self.group.id})
 
@@ -184,6 +182,7 @@ class FollowPostTest(TestCase):
                                                username='chubaka',
                                                email='wooki@wooki.wooki',
                                                password='aaaagrh')
+
 
     @override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache', }})
     def test_following_and_unfollowing(self):

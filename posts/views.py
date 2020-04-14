@@ -129,6 +129,5 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     follower = User.objects.get(username=request.user)
     following = User.objects.get(username=username)
-    unfollow_id = Follow.objects.filter(user=follower, author=following)
-    unfollow_id.delete()
+    Follow.objects.filter(user=follower, author=following).delete()
     return redirect('profile', username)

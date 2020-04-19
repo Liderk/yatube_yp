@@ -3,11 +3,12 @@
     {% block title %} {% if post %} Редактировать запись {% else %} Добавить запись {% endif %} {% endblock %}
 
 {% block content %}
+{% load user_filters %}
     {% if post %}
            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                    <p>{{ form.group }} выберите группу в которой хотите опубликовать свой пост </p>
-                   <p>{{ form.text }}  </p>
+                   <p>{{ form.text|addclass:"form-control"  }}  </p>
                    <p>{{ form.image }}  </p>
                    <button type="submit" class="btn btn-primary" >Сохранить</button>
 

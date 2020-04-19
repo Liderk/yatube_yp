@@ -35,7 +35,7 @@
                         <!-- Отображение ссылки на комментарии -->
                         <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group ">
-                                        <a class="btn btn-sm text-muted " href="{% url 'post' post.author.username post.id %}" role="button">
+                                        <a class="btn btn-sm text-primary " href="{% url 'post' post.author.username post.id %}" role="button">
                                                 {% if post.posts_comment.count %}
                                                 {{ post.posts_comment.count }} комментариев
                                                 {% else%}
@@ -45,11 +45,15 @@
 
                                         <!-- Ссылка на редактирование поста для автора -->
                                         {% if user == post.author %}
-                                        <a class="btn btn-sm text-muted" href="{% url 'post_edit' post.author.username post.id %}"
+                                        <a class="btn btn-sm text-primary" href="{% url 'post_edit' post.author.username post.id %}"
                                                 role="button">
                                                 Редактировать
                                         </a>
 
+                                        <a class="btn btn-sm text-muted" href="{% url 'post_dell' post.author.username post.id %}"
+                                                role="button">
+                                                Удалить пост
+                                        </a>
                                         {% endif %}
                                 </div>
 

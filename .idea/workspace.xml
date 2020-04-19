@@ -2,12 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d68c1967-f846-478c-b3ae-9eb0ed191e05" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/users/templatetags/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/users/templatetags/user_filters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/posts/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/posts/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/posts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/posts/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/posts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/posts/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yatube/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/yatube/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yatube/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/yatube/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/menu.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/nav.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/nav.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/new_post.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/new_post.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/post_item.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/post_item.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/templates/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/users/templates/signup.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,8 +23,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>

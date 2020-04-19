@@ -1,17 +1,30 @@
-<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-    <a class="navbar-brand" href="/"><span style="color:red">Ya</span>tube</a>
-    <nav class="my-2 my-md-0 mr-md-3">
-        {% if user.is_authenticated %}
-        {% url 'new_post' as the_url %}
-        {% if the_url %}
-        <a class="p-2 text-dark" href="{{ the_url }}">Новая запись</a>
-        {% endif %}
-        Пользователь: <a href="/{{user.username}}"><strong class="p-2 text-dark">{{user.username}}</strong></a>
-        <a class="p-2 text-dark" href="{% url 'password_change' %}">Изменить пароль</a>
-        <a class="p-2 text-dark" href="{% url 'logout' %}">Выйти</a>
-        {% else %}
-        <a class="p-2 text-dark" href="{% url 'login' %}">Войти</a> |
-        <a class="p-2 text-dark" href="{% url 'signup' %}">Регистрация</a>
-        {% endif %}
-    </nav>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/"><span style="color:red">Ya</span>tube</a>
+{% if user.is_authenticated %}
+  <div class="collapse navbar-collapse my-2 my-lg-0" id="navbarColor02">
+    <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+                <a class="nav-link" href="/{{user.username}}">{{user.username|title}} <span class="sr-only">(current)</span></a>
+              </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'new_post' %}">Новая запись</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'password_change' %}">Изменить пароль</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+          </li>
+  {% else %}
+   <div class="collapse navbar-collapse my-2 my-lg-0" id="navbarColor02">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}">Войти</a> |
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'signup' %}">Регистрация</a>
+          </li>
+    </ul>
+  </div>
+ {% endif %}
 </nav>

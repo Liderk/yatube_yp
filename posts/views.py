@@ -13,7 +13,7 @@ def index(request):
     paginator = Paginator(post_list, 3)  # показывать по 10 записей на странице.
     page_number = request.GET.get('page')  # переменная в URL с номером запрошенной страницы
     page = paginator.get_page(page_number)  # получить записи с нужным смещением
-    return render(request, 'index.html', {'page': page, 'paginator': paginator})
+    return render(request, 'index.html', {'page': page, 'paginator': paginator, 'index': True})
 
 
 def group_posts(request, slug):
@@ -49,7 +49,8 @@ def profile(request, username):
     page = paginator.get_page(page_number)
     following = Follow.objects.filter(author=author, user=request.user.id)
     return render(request, "profile.html",
-                  {'author': author, 'page': page, 'paginator': paginator, 'following': following, 'user': request.user.id})
+                  {'author': author, 'page': page, 'paginator': paginator, 'following': following,
+                   'user': request.user})
 
 
 @login_required
@@ -66,6 +67,16 @@ def post_edit(request, username, post_id):
         return render(request, 'new_post.html', {'form': form})
     form = UserCreateNewPost(instance=post)
     return render(request, 'new_post.html', {'form': form, 'post': post})
+
+
+@login_required
+def post_dell(request, username, post_id):
+    author = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, id=post_id, author=author)
+    if request.user != author:
+        return redirect("post", username=request.user.username, post_id=post_id)
+    post.delete()
+    return redirect('profile', username)
 
 
 def page_not_found(request, exception):
@@ -104,8 +115,7 @@ def add_comment(request, username, post_id):
 @login_required
 def follow_index(request):
     follower = Follow.objects.filter(user=request.user)
-    authors = (item.author.id for item in follower)
-    post_list = Post.objects.filter(author__in=authors).order_by('-pub_date').all()
+    post_list = Post.objects.filter(author__in=(item.author.id for item in follower)).order_by('-pub_date').all()
     paginator = Paginator(post_list, 5)  # показывать по 10 записей на странице.
     page_number = request.GET.get('page')  # переменная в URL с номером запрошенной страницы
     page = paginator.get_page(page_number)  # получить записи с нужным смещением
@@ -114,20 +124,18 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    follower = User.objects.get(username=request.user)
     following = User.objects.get(username=username)
-    if following == follower:
+    if following == request.user:
         return redirect('index')
     try:
-        following = Follow.objects.get(user=follower, author=following)
+        following = Follow.objects.get(user=request.user, author=following)
     except Follow.DoesNotExist:
-        Follow.objects.create(user=follower, author=following)
+        Follow.objects.create(user=request.user, author=following)
     return redirect('profile', username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    follower = User.objects.get(username=request.user)
     following = User.objects.get(username=username)
-    Follow.objects.filter(user=follower, author=following).delete()
+    Follow.objects.filter(user=request.user, author=following).delete()
     return redirect('profile', username)

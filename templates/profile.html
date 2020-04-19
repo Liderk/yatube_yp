@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Профиль пользователя {{ author.username }} {% endblock %}
 {% block content %}
+{% load user_filters %}
 {% csrf_token %}
         <main role="main" class="container">
             <div class="row">
@@ -36,13 +37,13 @@
                                         {% if request.user.id != author.id %}
                                             <li class="list-group-item">
                                                 {% if following %}
-                                                    <a class="btn btn-lg btn-light"
+                                                    <a class="btn btn-outline-secondary"
                                                             href="{% url 'profile_unfollow' author.username %}" role="button">
                                                             Отписаться
                                                     </a>
 
                                                 {% else %}
-                                                    <a class="btn btn-lg btn-primary"
+                                                    <a class="btn btn-outline-primary"
                                                             href="{% url 'profile_follow' author.username %}" role="button">
                                                     Подписаться
                                                     </a>

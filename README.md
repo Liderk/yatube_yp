@@ -1,5 +1,6 @@
 # Yatube_final
 stack:python 3.+, django2.+, PostgreSQL, ngnix, gunicorn, docker
+
 Учебный проект по созданию блога на 
 Django, в рамках обучения в Яндекс.Практикуме по специальности 
 Python-разработчик.
